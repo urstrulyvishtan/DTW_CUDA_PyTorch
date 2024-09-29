@@ -1,5 +1,5 @@
 # README
- This README file provides an overview of the DTW Accelerated CUDA for PyTorch project.
+ This file provides an overview of the DTW Accelerated CUDA for PyTorch project.
  The project focuses on accelerating Dynamic Time Warping (DTW) using CUDA for PyTorch.
  
 ### Key components:
