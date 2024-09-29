@@ -62,5 +62,18 @@ void shfl_FullDTW_127(
     
     penalty_diag = penalty_left;
     penalty_left = __shfl_up_sync(0xFFFFFFFF, penalty_here3, 1, 32);
-    
+
+    if(thid == 0) penalty_left = INFINITY;
+
+    for(index_t k = 3; k<lane+WARP_SIZE-1; k++){
+        const index_t i = k-1;
+
+        penalty_temp0 = penalty_here0;
+        penalty_here0 = (query_value-subject_value0) * (query_value-subject_value0) + min(penalty_left, min(penalty_here0, penalty_diag));
+        penalty_temp1 = penalty_here1;
+        penalty_here1 = (query_value-subject_value1) * (query_value-subject_value1) + min(penalty_here0, min(penalty_here1, penalty_temp0));
+        penalty_temp0 = penalty_here2;
+        penalty_here2 = (query_value-subject_value2) * (query_value-subject_value2) + min(penalty_here1, min(penalty_here2, penalty_temp1));
+        penalty_here3 = (query_value-subject_value3) * (query_value-subject_value3) + min(penalty_here2, min(penalty_here3, penalty_temp0));
+    }
     }
