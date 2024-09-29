@@ -75,5 +75,16 @@ void shfl_FullDTW_127(
         penalty_temp0 = penalty_here2;
         penalty_here2 = (query_value-subject_value2) * (query_value-subject_value2) + min(penalty_here1, min(penalty_here2, penalty_temp1));
         penalty_here3 = (query_value-subject_value3) * (query_value-subject_value3) + min(penalty_here2, min(penalty_here3, penalty_temp0));
+
+        if(counter%32 == 0) new_query_value = cQuery[i+2*thid-1];
+        query_value = __shfl_up_sync(0xFFFFFFFF, query_value, 1, 32);
+        if(thid == 0) query_value = new_query_value;
+        new_query_value = __shfl_down_sync(0xFFFFFFFF, new_query_value, 1, 32);
+        counter++;
+
+        penalty_diag = penalty_left;
+        penalty_left = __shfl_up_sync(0xFFFFFFFF, penalty_here3, 1, 32);
+        if(thid == 0) penalty_left = INFINITY;
     }
+    
     }
