@@ -65,5 +65,70 @@ void shfl_FullDTW_255(
     penalty_here1 = (query_value - subject_value1)*(query_value - subject_value1) + min(penalty_here0, min(penalty_here1, penalty_temp0));
     penalty_temp0 = penalty_here2;
     penalty_here2 = (query_value - subject_value2)*(query_value - subject_value2) + min(penalty_here1, min(penalty_here2, penalty_temp1));
+    penalty_temp1 = penalty_here3;
+    penalty_here3 = (query_value - subject_value3)*(query_value - subject_value3) + min(penalty_here2, min(penalty_here3, penalty_temp0));
+    penalty_temp0 = penalty_here4;
+    penalty_here4 = (query_value - subject_value4)*(query_value - subject_value4) + min(penalty_here3, min(penalty_here4, penalty_temp1));
+    penalty_temp1 = penalty_here5;
+    penalty_here5 = (query_value - subject_value5)*(query_value - subject_value5) + min(penalty_here4, min(penalty_here5, penalty_temp0));
+    penalty_temp0 = penalty_here6;
+    penalty_here6 = (query_value - subject_value6)*(query_value - subject_value6) + min(penalty_here5, min(penalty_here6, penalty_temp1));
+    penalty_here7 = (query_value - subject_value7)*(query_value - subject_value7) + min(penalty_here6, min(penalty_here7, penalty_temp0));
     
+    query_value = __shfl_up_sync(0xFFFFFFFF, query_value, 1, 32);
+    if(thid == 0) query_value = new_query_value;
+    new_query_value = __shfl_down_sync(0xFFFFFFFF, new_query_value, 1, 32);
+    counter++;
+    penalty_diag = penalty_left;
+    penalty_left = __shfl_up_sync(0xFFFFFFFF, penalty_here7, 1, 32);
+    if(thid == 0)penalty_left = INFINITY;
+    for(index_t k = 3; k<lane+WARP_SIZE-1; k++){
+        const index_t i = k-l;
+        penalty_temp0 = penalty_here0;
+        penalty_here0 = (query_value - subject_value0)*(query_value - subject_value0) + min(penalty_left, min(penalty_here0, penalty_diag));
+        penalty_temp1 = INFINITY;
+        penalty_here1 = (query_value - subject_value1)*(query_value - subject_value1) + min(penalty_here0, min(penalty_here1, penalty_temp0));
+        penalty_temp0 = penalty_here2;
+        penalty_here2 = (query_value - subject_value2)*(query_value - subject_value2) + min(penalty_here1, min(penalty_here2, penalty_temp1));
+        penalty_temp1 = penalty_here3;
+        penalty_here3 = (query_value - subject_value3)*(query_value - subject_value3) + min(penalty_here2, min(penalty_here3, penalty_temp0));
+        penalty_temp0 = penalty_here4;
+        penalty_here4 = (query_value - subject_value4)*(query_value - subject_value4) + min(penalty_here3, min(penalty_here4, penalty_temp1));
+        penalty_temp1 = penalty_here5;
+        penalty_here5 = (query_value - subject_value5)*(query_value - subject_value5) + min(penalty_here4, min(penalty_here5, penalty_temp0));
+        penalty_temp0 = penalty_here6;
+        penalty_here6 = (query_value - subject_value6)*(query_value - subject_value6) + min(penalty_here5, min(penalty_here6, penalty_temp1));
+        penalty_here7 = (query_value - subject_value7)*(query_value - subject_value7) + min(penalty_here6, min(penalty_here7, penalty_temp0));
+
+        if (counter%32 == 0) new_query_value = cQuery[i+2*thid-1];
+        query_value = __shfl_up_sync(0xFFFFFFFF, query_value, 1, 32);
+        if(thid == 0) query_value = new_query_value;
+        new_query_value = __shfl_down_sync(0xFFFFFFFF, new_query_value, 1, 32);
+        counter++;
+
+
+        penalty_diag = penalty_left;
+        penalty_left = __shfl_up_sync(0xFFFFFFFF, penalty_here7, 1, 32);
+
+        if (thid == 0) penalty_left = INFINITY;
+    }
+    penalty_temp0 = penalty_here0;
+    penalty_here0 = (query_value - subject_value0)*(query_value - subject_value0) + min(penalty_left, min(penalty_here0, penalty_diag));
+    penalty_temp1 = INFINITY;
+    penalty_here1 = (query_value - subject_value1)*(query_value - subject_value1) + min(penalty_here0, min(penalty_here1, penalty_temp0));
+    penalty_temp0 = penalty_here2;
+    penalty_here2 = (query_value - subject_value2)*(query_value - subject_value2) + min(penalty_here1, min(penalty_here2, penalty_temp1));
+    penalty_temp1 = penalty_here3;
+    penalty_here3 = (query_value - subject_value3)*(query_value - subject_value3) + min(penalty_here2, min(penalty_here3, penalty_temp0));
+    penalty_temp0 = penalty_here4;
+    penalty_here4 = (query_value - subject_value4)*(query_value - subject_value4) + min(penalty_here3, min(penalty_here4, penalty_temp1));
+    penalty_temp1 = penalty_here5;
+    penalty_here5 = (query_value - subject_value5)*(query_value - subject_value5) + min(penalty_here4, min(penalty_here5, penalty_temp0));
+    penalty_temp0 = penalty_here6;
+    penalty_here6 = (query_value - subject_value6)*(query_value - subject_value6) + min(penalty_here5, min(penalty_here6, penalty_temp1));
+    penalty_here7 = (query_value - subject_value7)*(query_value - subject_value7) + min(penalty_here6, min(penalty_here7, penalty_temp0));
+
+    if (thid == blockDim.x-1) Dist[blid] = penalty_here7;
 }
+
+#endif
