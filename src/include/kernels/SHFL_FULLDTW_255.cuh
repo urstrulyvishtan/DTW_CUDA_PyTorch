@@ -18,4 +18,17 @@ void shfl_FullDTW_255(
     const index_t 1 = thid;
 
     // extern __shared__ value_t Subject_cache[];
+
+    value_t penalty_left = INFINITY;
+    value_t penalty_diag = 0;
+    value_t penalty_here0 = INFINITY;
+    value_t penalty_here1 = INFINITY;
+    value_t penalty_here2 = INFINITY;
+    value_t penalty_here3 = INFINITY;
+    value_t penalty_here4 = INFINITY;
+    value_t penalty_here5 = INFINITY;
+    value_t penalty_here6 = INFINITY;
+    value_t penalty_here7 = INFINITY;
+    value_t penalty_temp0;
+    value_t penalty_temp1;
 }
